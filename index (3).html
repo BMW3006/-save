@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RX Save – Download Anything</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050a12;
+    --surface: #0d1520;
+    --surface2: #121e2e;
+    --border: rgba(0,200,255,0.12);
+    --accent: #00c8ff;
+    --accent2: #7b5fff;
+    --accent3: #00ffb2;
+    --text: #e8f4ff;
+    --muted: #7a9ab8;
+    --danger: #ff4d6d;
+    --success: #00e58a;
+    --radius: 16px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated bg grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(0,200,255,0.06); top: -150px; left: -100px; }
+  .orb2 { width: 400px; height: 400px; background: rgba(123,95,255,0.08); bottom: 100px; right: -100px; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+    background: rgba(5,10,18,0.8);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: var(--font-head);
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo span { color: var(--accent); }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-link {
+    padding: 8px 16px; border-radius: 8px;
+    background: none; border: none;
+    color: var(--muted); font-size: 14px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .nav-link:hover, .nav-link.active { color: var(--accent); background: rgba(0,200,255,0.08); }
+
+  main { position: relative; z-index: 1; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 80px 5% 60px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 100px;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.2);
+    font-size: 13px; color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-family: var(--font-head);
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+  }
+  h1 .highlight {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 18px; color: var(--muted);
+    line-height: 1.6; max-width: 520px; margin: 0 auto 40px;
+    font-weight: 300;
+  }
+
+  /* PLATFORM TABS */
+  .platform-tabs {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 32px;
+  }
+  .tab-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted); font-size: 14px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body); font-weight: 500;
+  }
+  .tab-btn:hover { border-color: rgba(0,200,255,0.3); color: var(--text); }
+  .tab-btn.active {
+    background: rgba(0,200,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tab-btn .tab-icon { width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+  /* DOWNLOAD CARD */
+  .download-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 720px;
+    margin: 0 auto 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .download-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .input-row {
+    display: flex; gap: 12px; align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 8px 8px 20px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within { border-color: rgba(0,200,255,0.4); }
+  #url-input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-size: 15px;
+    font-family: var(--font-body);
+    padding: 8px 0;
+  }
+  #url-input::placeholder { color: var(--muted); }
+  .paste-btn {
+    padding: 8px 16px; border-radius: 8px;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.2);
+    color: var(--accent); font-size: 13px; cursor: pointer;
+    transition: all 0.2s; font-family: var(--font-body);
+    white-space: nowrap;
+  }
+  .paste-btn:hover { background: rgba(0,200,255,0.16); }
+
+  /* Format toggles */
+  .format-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .format-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .format-btns { display: flex; gap: 6px; }
+  .fmt-btn {
+    padding: 6px 16px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted); font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .fmt-btn.active { background: rgba(123,95,255,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .fmt-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* Download button */
+  .dl-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 14px;
+    color: #fff; font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: all 0.25s;
+    font-family: var(--font-head);
+    letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .dl-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 12px 40px rgba(0,200,255,0.25); }
+  .dl-btn:active { transform: translateY(0); }
+  .dl-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .dl-btn svg { flex-shrink: 0; }
+
+  /* Result area */
+  #result-area { margin-top: 20px; }
+  .result-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .result-title { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .result-status { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+  .result-status.ok { color: var(--success); }
+  .result-status.err { color: var(--danger); }
+
+  .media-info {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .thumb {
+    width: 80px; height: 56px; object-fit: cover;
+    border-radius: 8px; flex-shrink: 0;
+    background: var(--surface); display: block;
+  }
+  .media-details { flex: 1; min-width: 0; }
+  .media-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .media-meta { font-size: 13px; color: var(--muted); }
+
+  .download-links { display: flex; flex-direction: column; gap: 8px; }
+  .dl-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-decoration: none; color: var(--text);
+    font-size: 14px; transition: all 0.2s;
+    cursor: pointer;
+  }
+  .dl-link:hover { border-color: rgba(0,200,255,0.3); background: rgba(0,200,255,0.05); }
+  .dl-link-info { display: flex; align-items: center; gap: 10px; }
+  .dl-link-type {
+    padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    background: rgba(0,200,255,0.1); color: var(--accent);
+  }
+  .dl-link-type.audio { background: rgba(123,95,255,0.12); color: var(--accent2); }
+  .dl-link-type.git { background: rgba(0,255,178,0.1); color: var(--accent3); }
+  .dl-link-size { font-size: 12px; color: var(--muted); }
+  .dl-arrow {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(0,200,255,0.1); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* PLATFORM FEATURES */
+  .platforms-section {
+    padding: 60px 5%;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .section-label {
+    font-size: 13px; font-weight: 600; letter-spacing: 2px;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--font-head);
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 700; letter-spacing: -1px;
+    margin-bottom: 40px;
+  }
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .platform-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    cursor: pointer; transition: all 0.25s;
+    text-decoration: none; color: inherit;
+    display: block;
+  }
+  .platform-card:hover { border-color: rgba(0,200,255,0.3); transform: translateY(-3px); background: var(--surface2); }
+  .platform-card .icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 14px;
+  }
+  .platform-card h3 {
+    font-family: var(--font-head); font-size: 16px; font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .platform-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .platform-tag {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 60px 5%;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .steps { display: flex; gap: 24px; flex-wrap: wrap; }
+  .step {
+    flex: 1; min-width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 24px;
+    position: relative;
+  }
+  .step-num {
+    font-family: var(--font-head);
+    font-size: 48px; font-weight: 800; opacity: 0.06;
+    position: absolute; top: 16px; right: 20px;
+    color: var(--accent); line-height: 1;
+  }
+  .step-icon { font-size: 28px; margin-bottom: 16px; }
+  .step h3 { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 5%; margin-top: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-logo { font-family: var(--font-head); font-weight: 800; font-size: 18px; }
+  .footer-logo span { color: var(--accent); }
+  .footer-text { font-size: 13px; color: var(--muted); }
+
+  /* MUSIC SEARCH SECTION */
+  .music-section {
+    padding: 60px 5%;
+    max-width: 900px; margin: 0 auto;
+  }
+  .music-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .music-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  }
+  .music-mode-toggle {
+    display: flex; gap: 0; margin-bottom: 24px;
+    background: var(--surface2); border-radius: 12px; padding: 4px;
+    border: 1px solid var(--border);
+  }
+  .mode-btn {
+    flex: 1; padding: 10px 16px; border-radius: 9px;
+    border: none; background: none;
+    color: var(--muted); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .mode-btn.active {
+    background: rgba(123,95,255,0.2);
+    color: var(--accent2);
+    border: 1px solid rgba(123,95,255,0.3);
+  }
+  .music-search-row {
+    display: flex; gap: 10px; align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 8px 8px 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .music-search-row:focus-within { border-color: rgba(123,95,255,0.4); }
+  #music-input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-size: 15px;
+    font-family: var(--font-body); padding: 8px 0;
+  }
+  #music-input::placeholder { color: var(--muted); }
+  .search-btn {
+    padding: 10px 20px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent2), #5e3fff);
+    border: none; color: #fff; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body); white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .search-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Search results */
+  .search-results { margin-top: 20px; }
+  .results-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .song-list { display: flex; flex-direction: column; gap: 8px; }
+  .song-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer; transition: all 0.2s;
+    animation: fadeIn 0.3s ease both;
+  }
+  .song-item:hover { border-color: rgba(123,95,255,0.35); background: rgba(123,95,255,0.06); }
+  .song-item.downloading { border-color: rgba(0,200,255,0.3); background: rgba(0,200,255,0.05); }
+  .song-thumb {
+    width: 52px; height: 52px; border-radius: 8px;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--surface);
+  }
+  .song-info { flex: 1; min-width: 0; }
+  .song-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .song-meta { font-size: 12px; color: var(--muted); }
+  .song-duration { font-size: 12px; color: var(--muted); white-space: nowrap; margin-right: 8px; }
+  .song-dl-btn {
+    padding: 8px 16px; border-radius: 8px;
+    background: rgba(123,95,255,0.12);
+    border: 1px solid rgba(123,95,255,0.25);
+    color: var(--accent2); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font-body); white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  .song-dl-btn:hover { background: rgba(123,95,255,0.22); border-color: rgba(123,95,255,0.5); }
+  .song-dl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .song-dl-btn.done { background: rgba(0,229,138,0.1); border-color: rgba(0,229,138,0.3); color: var(--success); }
+
+  /* Song download result popup */
+  .song-result-inline {
+    margin-top: 8px; padding: 12px 16px;
+    background: rgba(0,200,255,0.05);
+    border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 10px;
+    animation: fadeIn 0.25s ease;
+  }
+  .song-result-inline a {
+    display: flex; align-items: center; justify-content: space-between;
+    text-decoration: none; color: var(--text);
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface); font-size: 13px;
+    margin-bottom: 6px; transition: all 0.2s;
+  }
+  .song-result-inline a:last-child { margin-bottom: 0; }
+  .song-result-inline a:hover { border-color: rgba(0,200,255,0.3); }
+
+  /* Url mode tip */
+  .url-mode-tip {
+    font-size: 13px; color: var(--muted);
+    padding: 10px 14px; border-radius: 10px;
+    background: rgba(123,95,255,0.06);
+    border: 1px solid rgba(123,95,255,0.15);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Error & empty states */
+  .error-box {
+    background: rgba(255,77,109,0.08); border: 1px solid rgba(255,77,109,0.3);
+    border-radius: 12px; padding: 16px 20px;
+    color: var(--danger); font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+    animation: fadeIn 0.3s ease;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .download-card { padding: 20px; }
+    .format-row { flex-wrap: wrap; }
+    .steps { flex-direction: column; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-orb orb1"></div>
+<div class="glow-orb orb2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">⬇</div>
+    RX <span>Save</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="scrollTo(0,0)">Home</button>
+    <button class="nav-link" onclick="document.getElementById('platforms').scrollIntoView({behavior:'smooth'})">Platforms</button>
+    <button class="nav-link" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">Free · No signup · Instant download</div>
+    <h1>Download from<br>any platform with<br><span class="highlight">one click</span></h1>
+    <p class="hero-sub">Save videos, audio, reels, and repos from YouTube, TikTok, Instagram, Facebook, Spotify, GitHub, and more.</p>
+
+    <!-- TABS -->
+    <div class="platform-tabs">
+      <button class="tab-btn active" data-platform="auto" onclick="selectPlatform(this)">
+        <span class="tab-icon">✨</span> Auto Detect
+      </button>
+      <button class="tab-btn" data-platform="youtube" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:#ff0000;color:#fff;">▶</span> YouTube
+      </button>
+      <button class="tab-btn" data-platform="tiktok" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:#000;color:#fff;">♪</span> TikTok
+      </button>
+      <button class="tab-btn" data-platform="instagram" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;">📷</span> Instagram
+      </button>
+      <button class="tab-btn" data-platform="facebook" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:#1877f2;color:#fff;">f</span> Facebook
+      </button>
+      <button class="tab-btn" data-platform="spotify" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:#1db954;color:#fff;">♫</span> Spotify
+      </button>
+      <button class="tab-btn" data-platform="github" onclick="selectPlatform(this)">
+        <span class="tab-icon" style="background:#24292e;color:#fff;">⌥</span> GitHub
+      </button>
+    </div>
+
+    <!-- DOWNLOAD CARD -->
+    <div class="download-card">
+      <div class="input-row">
+        <input type="url" id="url-input" placeholder="Paste link here... (YouTube, TikTok, Instagram, Facebook, Spotify, GitHub)" autocomplete="off">
+        <button class="paste-btn" onclick="pasteURL()">📋 Paste</button>
+      </div>
+
+      <div class="format-row" id="format-row" style="display:none">
+        <span class="format-label">Format:</span>
+        <div class="format-btns">
+          <button class="fmt-btn active" data-fmt="mp4" onclick="selectFormat(this)">MP4 Video</button>
+          <button class="fmt-btn" data-fmt="mp3" onclick="selectFormat(this)">MP3 Audio</button>
+        </div>
+      </div>
+
+      <button class="dl-btn" id="dl-btn" onclick="startDownload()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v13M6 11l6 6 6-6"/><path d="M3 19h18"/></svg>
+        Download Now
+      </button>
+
+      <div id="result-area"></div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="platforms-section" id="platforms">
+    <p class="section-label">Supported Platforms</p>
+    <h2 class="section-title">Download from everywhere</h2>
+    <div class="platforms-grid">
+
+      <a class="platform-card" onclick="setAndFocus('youtube')">
+        <div class="icon" style="background:rgba(255,0,0,0.12)">▶️</div>
+        <h3>YouTube</h3>
+        <p>Download videos in HD or extract audio as MP3</p>
+        <span class="platform-tag" style="background:rgba(255,0,0,0.1);color:#ff4444">Video · Audio</span>
+      </a>
+
+      <a class="platform-card" onclick="setAndFocus('tiktok')">
+        <div class="icon" style="background:rgba(0,0,0,0.3)">🎵</div>
+        <h3>TikTok</h3>
+        <p>Save TikTok videos without watermark instantly</p>
+        <span class="platform-tag" style="background:rgba(0,200,255,0.08);color:var(--accent)">No Watermark</span>
+      </a>
+
+      <a class="platform-card" onclick="setAndFocus('instagram')">
+        <div class="icon" style="background:rgba(220,39,67,0.1)">📸</div>
+        <h3>Instagram</h3>
+        <p>Download reels, posts and stories with ease</p>
+        <span class="platform-tag" style="background:rgba(220,39,67,0.1);color:#e0607e">Reels · Posts</span>
+      </a>
+
+      <a class="platform-card" onclick="setAndFocus('facebook')">
+        <div class="icon" style="background:rgba(24,119,242,0.1)">📘</div>
+        <h3>Facebook</h3>
+        <p>Save Facebook videos and reels in full quality</p>
+        <span class="platform-tag" style="background:rgba(24,119,242,0.1);color:#4a9eff">HD Quality</span>
+      </a>
+
+      <a class="platform-card" onclick="setAndFocus('spotify')">
+        <div class="icon" style="background:rgba(29,185,84,0.1)">🎧</div>
+        <h3>Spotify</h3>
+        <p>Download Spotify tracks as high-quality audio</p>
+        <span class="platform-tag" style="background:rgba(29,185,84,0.1);color:#1db954">MP3 Audio</span>
+      </a>
+
+      <a class="platform-card" onclick="setAndFocus('github')">
+        <div class="icon" style="background:rgba(255,255,255,0.06)">⚙️</div>
+        <h3>GitHub</h3>
+        <p>Clone and download GitHub repositories as ZIP</p>
+        <span class="platform-tag" style="background:rgba(0,255,178,0.08);color:var(--accent3)">Repo Clone</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section" id="how">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">Three steps to save</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div class="step-icon">🔗</div>
+        <h3>Copy the link</h3>
+        <p>Grab the URL from any supported platform — YouTube, TikTok, Instagram, Facebook, Spotify, or GitHub.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div class="step-icon">📋</div>
+        <h3>Paste & select</h3>
+        <p>Paste the link into RX Save. Choose your preferred format — video MP4 or audio MP3 where applicable.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div class="step-icon">⬇️</div>
+        <h3>Download instantly</h3>
+        <p>Hit Download Now and get your file immediately. No account needed, completely free.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-logo">RX <span>Save</span></div>
+  <p class="footer-text">© 2025 RX Save · Fast, free social media downloader</p>
+  <p class="footer-text">For personal use only. Respect copyright laws.</p>
+</footer>
+
+<script>
+const BASE = 'https://api.giftedtech.co.ke/api/download';
+const KEY = 'gifted';
+
+let currentPlatform = 'auto';
+let currentFormat = 'mp4';
+
+const PLATFORM_HINTS = {
+  youtube: ['youtube.com', 'youtu.be'],
+  tiktok: ['tiktok.com', 'vm.tiktok.com'],
+  instagram: ['instagram.com'],
+  facebook: ['facebook.com', 'fb.watch'],
+  spotify: ['open.spotify.com', 'spotify.com'],
+  github: ['github.com'],
+};
+
+function detectPlatform(url) {
+  for (const [p, hints] of Object.entries(PLATFORM_HINTS)) {
+    if (hints.some(h => url.includes(h))) return p;
+  }
+  return 'auto';
+}
+
+function selectPlatform(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPlatform = btn.dataset.platform;
+  updateFormatRow();
+  document.getElementById('url-input').focus();
+}
+
+function setAndFocus(platform) {
+  const btn = document.querySelector(`[data-platform="${platform}"]`);
+  if (btn) selectPlatform(btn);
+  document.getElementById('url-input').focus();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function selectFormat(btn) {
+  document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFormat = btn.dataset.fmt;
+}
+
+function updateFormatRow() {
+  const row = document.getElementById('format-row');
+  const ytFmts = ['youtube', 'auto'];
+  row.style.display = ytFmts.includes(currentPlatform) ? 'flex' : 'none';
+}
+
+async function pasteURL() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('url-input').value = text;
+    const p = detectPlatform(text);
+    if (p !== 'auto') {
+      const btn = document.querySelector(`[data-platform="${p}"]`);
+      if (btn) selectPlatform(btn);
+    }
+    updateFormatRow();
+  } catch { alert('Please paste the URL manually into the input field.'); }
+}
+
+document.getElementById('url-input').addEventListener('input', function() {
+  const p = detectPlatform(this.value);
+  if (p !== 'auto') {
+    const btn = document.querySelector(`[data-platform="${p}"]`);
+    if (btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPlatform = p;
+    }
+  }
+  updateFormatRow();
+});
+
+function getApiEndpoint(url) {
+  const p = currentPlatform === 'auto' ? detectPlatform(url) : currentPlatform;
+  if (p === 'youtube') {
+    return currentFormat === 'mp3'
+      ? `${BASE}/savetubemp3?apikey=${KEY}&url=${encodeURIComponent(url)}`
+      : `${BASE}/savetubemp4?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  }
+  if (p === 'tiktok') return `${BASE}/tiktokdlv5?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  if (p === 'instagram') return `${BASE}/instadlv2?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  if (p === 'facebook') return `${BASE}/facebook?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  if (p === 'spotify') return `${BASE}/spotifydlv3?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  if (p === 'github') return `${BASE}/gitclone?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+  return `${BASE}/aio?apikey=${KEY}&url=${encodeURIComponent(url)}`;
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('dl-btn');
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? `<span class="spinner"></span> Fetching...`
+    : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v13M6 11l6 6 6-6"/><path d="M3 19h18"/></svg> Download Now`;
+}
+
+function renderError(msg) {
+  return `<div class="error-box">⚠️ ${msg}</div>`;
+}
+
+function renderLinks(data) {
+  const results = [];
+
+  const addLink = (url, label, type, size) => {
+    if (!url || typeof url !== 'string' || !url.startsWith('http')) return;
+    results.push({ url, label, type, size });
+  };
+
+  if (data.result) {
+    const r = data.result;
+    if (r.download_url) addLink(r.download_url, 'Download', 'mp4');
+    if (r.video) addLink(r.video, 'Video (MP4)', 'mp4');
+    if (r.audio) addLink(r.audio, 'Audio (MP3)', 'audio', r.audio_size);
+    if (r.mp4) addLink(r.mp4, 'Video HD', 'mp4', r.size);
+    if (r.mp3) addLink(r.mp3, 'Audio MP3', 'audio');
+    if (r.download) addLink(r.download, 'Download', r.type === 'audio' ? 'audio' : 'mp4');
+    if (r.url) addLink(r.url, 'Download File', 'mp4');
+    if (r.source) addLink(r.source, 'Source', 'mp4');
+    if (r.zip_url) addLink(r.zip_url, 'Download ZIP', 'git');
+
+    if (Array.isArray(r.medias)) {
+      r.medias.forEach((m, i) => {
+        if (m.url) addLink(m.url, m.quality || `Option ${i+1}`, m.extension === 'mp3' ? 'audio' : 'mp4', m.size);
+      });
+    }
+    if (Array.isArray(r.links)) {
+      r.links.forEach((l, i) => {
+        const u = l.url || l.link || l;
+        addLink(u, l.quality || `Link ${i+1}`, l.type === 'audio' ? 'audio' : 'mp4', l.size);
+      });
+    }
+
+    const title = r.title || r.name || r.track || data.title || '';
+    const thumb = r.thumb || r.thumbnail || r.cover || r.image || '';
+
+    let html = `<div class="result-box">
+      <div class="result-header">
+        <span class="result-title">Download ready</span>
+        <span class="result-status ok">✓ Success</span>
+      </div>`;
+
+    if (title || thumb) {
+      html += `<div class="media-info">`;
+      if (thumb) html += `<img class="thumb" src="${thumb}" alt="thumbnail" onerror="this.style.display='none'">`;
+      if (title || r.duration || r.artist) {
+        html += `<div class="media-details">`;
+        if (title) html += `<div class="media-title">${escHtml(title)}</div>`;
+        const meta = [r.duration, r.artist, r.channel, r.uploader].filter(Boolean).join(' · ');
+        if (meta) html += `<div class="media-meta">${escHtml(meta)}</div>`;
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (results.length === 0) {
+      html += renderError('No downloadable links found in response.');
+    } else {
+      html += `<div class="download-links">`;
+      results.forEach(l => {
+        html += `<a class="dl-link" href="${l.url}" target="_blank" rel="noopener">
+          <div class="dl-link-info">
+            <span class="dl-link-type ${l.type}">${l.type.toUpperCase()}</span>
+            <span>${escHtml(l.label)}</span>
+            ${l.size ? `<span class="dl-link-size">${escHtml(String(l.size))}</span>` : ''}
+          </div>
+          <span class="dl-arrow">↓</span>
+        </a>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+    return html;
+  }
+
+  return renderError('Unexpected response from server. Please try again.');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function startDownload() {
+  const url = document.getElementById('url-input').value.trim();
+  const resultArea = document.getElementById('result-area');
+  resultArea.innerHTML = '';
+
+  if (!url) {
+    resultArea.innerHTML = renderError('Please enter a URL first.');
+    return;
+  }
+  if (!url.startsWith('http')) {
+    resultArea.innerHTML = renderError('Please enter a valid URL starting with http:// or https://');
+    return;
+  }
+
+  const apiUrl = getApiEndpoint(url);
+  setLoading(true);
+
+  try {
+    const resp = await fetch(apiUrl);
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
+    const data = await resp.json();
+    if (!data.success && !data.result) throw new Error(data.message || data.error || 'Download failed');
+    resultArea.innerHTML = renderLinks(data);
+  } catch (err) {
+    resultArea.innerHTML = renderError(`${err.message || 'Could not fetch download link. Please check the URL and try again.'}`);
+  } finally {
+    setLoading(false);
+  }
+}
+
+document.getElementById('url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startDownload();
+});
+</script>
+</body>
+</html>
