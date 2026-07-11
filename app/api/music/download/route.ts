@@ -82,6 +82,146 @@ const MOCK_SONGS: Record<string, any[]> = {
       ],
     },
   ],
+  'mbosso': [
+    {
+      id: 'song_6',
+      title: 'Yanga Boy',
+      artist: 'Mbosso',
+      duration: 237,
+      coverImage: 'https://images.unsplash.com/photo-1526336024174-c27aeeb361ec?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/yanga-boy-320.mp3',
+        },
+      ],
+    },
+    {
+      id: 'song_7',
+      title: 'Hodari',
+      artist: 'Mbosso',
+      duration: 213,
+      coverImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/hodari-320.mp3',
+        },
+      ],
+    },
+  ],
+  'dj': [
+    {
+      id: 'song_6',
+      title: 'Yanga Boy',
+      artist: 'Mbosso',
+      duration: 237,
+      coverImage: 'https://images.unsplash.com/photo-1526336024174-c27aeeb361ec?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/yanga-boy-320.mp3',
+        },
+      ],
+    },
+  ],
+  'wasafi': [
+    {
+      id: 'song_8',
+      title: 'Ye',
+      artist: 'Diamond Platnumz',
+      duration: 280,
+      coverImage: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/ye-320.mp3',
+        },
+      ],
+    },
+  ],
+  'diamond platnumz': [
+    {
+      id: 'song_8',
+      title: 'Ye',
+      artist: 'Diamond Platnumz',
+      duration: 280,
+      coverImage: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/ye-320.mp3',
+        },
+      ],
+    },
+  ],
+  'harmonize': [
+    {
+      id: 'song_9',
+      title: 'Mbongo',
+      artist: 'Harmonize',
+      duration: 210,
+      coverImage: 'https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/mbongo-320.mp3',
+        },
+      ],
+    },
+  ],
+  'rayvanny': [
+    {
+      id: 'song_10',
+      title: 'Down',
+      artist: 'Rayvanny',
+      duration: 198,
+      coverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/down-320.mp3',
+        },
+      ],
+    },
+  ],
+  'tanzanian': [
+    {
+      id: 'song_6',
+      title: 'Yanga Boy',
+      artist: 'Mbosso',
+      duration: 237,
+      coverImage: 'https://images.unsplash.com/photo-1526336024174-c27aeeb361ec?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/yanga-boy-320.mp3',
+        },
+      ],
+    },
+    {
+      id: 'song_8',
+      title: 'Ye',
+      artist: 'Diamond Platnumz',
+      duration: 280,
+      coverImage: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+      source: 'Spotify',
+      downloadFormats: [
+        {
+          format: 'MP3 (320kbps)',
+          url: 'https://example.com/ye-320.mp3',
+        },
+      ],
+    },
+  ],
 }
 
 export async function POST(request: NextRequest) {
@@ -162,11 +302,25 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[v0] No songs found for query:', query)
+    
+    // Get available suggestions
+    const suggestions = [
+      'Mbosso (Yanga Boy, Hodari)',
+      'Diamond Platnumz (Ye)',
+      'Harmonize (Mbongo)',
+      'Rayvanny (Down)',
+      'Blinding Lights',
+      'Bohemian Rhapsody',
+      'Africa',
+      'Shape of You',
+      'Imagine',
+    ]
+    
     return NextResponse.json(
       {
         success: false,
         error: 'Song not found',
-        message: `Could not find "${query}". Try searching for: Blinding Lights, Bohemian Rhapsody, Africa, Shape of You, or Imagine`,
+        message: `Could not find "${query}". Try searching for: ${suggestions.join(', ')}`,
       },
       { status: 404 }
     )
