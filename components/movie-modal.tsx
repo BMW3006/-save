@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { X, Star, Clock, Calendar, Play, Plus, Check, Share2, ExternalLink, Users } from "lucide-react"
+import { X, Star, Clock, Calendar, Play, Plus, Check, Users } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import type { Movie, MovieDetails, Cast, Video } from "@/lib/tmdb"
 import { getMovieDetails, getMovieCredits, getMovieVideos, getSimilarMovies, IMG_URL, BACKDROP_URL } from "@/lib/tmdb"
 import { useWatchlist } from "@/lib/watchlist"
+import { generateMovieShareUrl } from "@/lib/share"
 import { MovieCard } from "./movie-card"
+import { ShareButton } from "./share-button"
 import { toast } from "sonner"
 
 interface MovieModalProps {
@@ -60,28 +62,7 @@ export function MovieModal({ movie, isOpen, onClose, onMovieClick }: MovieModalP
     fetchData()
   }, [movie, isOpen, mediaType])
 
-  const handleShare = async () => {
-    const shareData = {
-      title: movie?.title || movie?.name || "Movie",
-      text: `Check out ${movie?.title || movie?.name} on NADHILI_DB!`,
-      url: window.location.href,
-    }
 
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData)
-      } catch {
-        copyToClipboard()
-      }
-    } else {
-      copyToClipboard()
-    }
-  }
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href)
-    toast.success("Link copied to clipboard!")
-  }
 
   const handleWatchlistToggle = () => {
     if (!movie) return
@@ -189,9 +170,13 @@ export function MovieModal({ movie, isOpen, onClose, onMovieClick }: MovieModalP
                 {inWatchlist ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                 {inWatchlist ? "In Watchlist" : "Add to Watchlist"}
               </Button>
-              <Button variant="outline" size="icon" className="rounded-full" onClick={handleShare}>
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <ShareButton
+                title={movie.title || movie.name || "Movie"}
+                description={details?.overview || movie.overview}
+                url={generateMovieShareUrl(movie.id, movie.title || movie.name || "Movie")}
+                type="movie"
+                showFeedback
+              />
             </div>
 
             {/* Genres */}
