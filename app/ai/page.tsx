@@ -2,17 +2,19 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, MessageSquare, Code2, ImageIcon, Sparkles } from "lucide-react"
+import { ArrowLeft, MessageSquare, Code2, ImageIcon, Sparkles, Music } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AiChat } from "@/components/ai/ai-chat"
 import { AiImage } from "@/components/ai/ai-image"
+import { GroqChat } from "@/components/groq-chat"
 
-type Tool = "chat" | "code" | "image"
+type Tool = "chat" | "code" | "image" | "music"
 
 const TOOLS = [
   { id: "chat" as Tool, label: "AI Chat", icon: MessageSquare, desc: "Chat with AI assistant" },
   { id: "code" as Tool, label: "Code Generator", icon: Code2, desc: "Generate code instantly" },
   { id: "image" as Tool, label: "Image Generator", icon: ImageIcon, desc: "Create AI images" },
+  { id: "music" as Tool, label: "Music AI", icon: Music, desc: "Chat about music with Groq AI" },
 ]
 
 export default function AiPage() {
@@ -85,6 +87,7 @@ export default function AiPage() {
           {activeTool === "chat" && <AiChat mode="chat" />}
           {activeTool === "code" && <AiChat mode="code" />}
           {activeTool === "image" && <AiImage />}
+          {activeTool === "music" && <GroqChat />}
         </div>
       </main>
     </div>

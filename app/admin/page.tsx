@@ -42,6 +42,7 @@ import { createClient } from "@/lib/supabase/client"
 import { searchMovies, getImageUrl, type Movie } from "@/lib/tmdb"
 import { DownloadsAdmin } from "@/components/admin/downloads-admin"
 import { APIsAdmin } from "@/components/admin/apis-admin"
+import { CustomAPIManager } from "@/components/admin/custom-api-manager"
 
 const ADMIN_PASSWORD = "3006"
 
@@ -570,6 +571,24 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <APIsAdmin />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Custom APIs Management - Full Width */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5 text-primary" />
+                Custom APIs
+              </CardTitle>
+              <CardDescription>
+                Add and manage custom API integrations for your services
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CustomAPIManager />
             </CardContent>
           </Card>
         </div>
