@@ -108,6 +108,18 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Music Search Link */}
+            <Link href="/music" className="hidden sm:block">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+              >
+                <Music className="h-4 w-4" />
+                Music
+              </Button>
+            </Link>
+
             {/* AI Link */}
             <Link href="/ai" className="hidden sm:block">
               <Button
@@ -226,6 +238,14 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
                       </Button>
                     ))}
                   </div>
+
+                  {/* Music Search Mobile */}
+                  <Link href="/music" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full justify-start gap-3">
+                      <Music className="h-5 w-5" />
+                      Music Search
+                    </Button>
+                  </Link>
 
                   {/* AI Link Mobile */}
                   <Link href="/ai" onClick={() => setIsOpen(false)}>
