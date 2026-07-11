@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { Music, Download, Heart, Search, Loader2 } from 'lucide-react'
+import { Music, Download, Heart, Search, Loader2, MessageCircle } from 'lucide-react'
 import { MusicTrack, saveMusicTrack, addFavoriteTrack, removeFavoriteTrack, isFavorited } from '@/lib/music'
+import { generateSongShareUrl, SUPPORT_WHATSAPP } from '@/lib/share'
+import { ShareButton } from './share-button'
 
 export function MusicSearch() {
   const [query, setQuery] = useState('')
@@ -132,7 +134,7 @@ export function MusicSearch() {
                   </p>
                 </div>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 flex-wrap pt-2">
                   <Button
                     onClick={() => handleDownload(track)}
                     disabled={!track.downloadFormats?.length}
@@ -151,6 +153,21 @@ export function MusicSearch() {
                       className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`}
                     />
                     {isFavorite ? 'Favorited' : 'Favorite'}
+                  </Button>
+                  <ShareButton
+                    title={`${track.title} by ${track.artist}`}
+                    description={`Listen to ${track.title} by ${track.artist}`}
+                    url={generateSongShareUrl(track.id, track.title)}
+                    type="song"
+                    showFeedback
+                  />
+                  <Button
+                    onClick={() => window.open(SUPPORT_WHATSAPP, '_blank')}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Feedback
                   </Button>
                 </div>
               </div>
