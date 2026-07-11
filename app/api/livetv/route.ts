@@ -8,7 +8,7 @@ const PLAYLISTS: Record<string, string> = {
   movies: "https://iptv-org.github.io/iptv/categories/movies.m3u",
   news: "https://iptv-org.github.io/iptv/categories/news.m3u",
   music: "https://iptv-org.github.io/iptv/categories/music.m3u",
-  sports: "https://raw.githubusercontent.com/BuddyChewChew/app-m3u-generator/refs/heads/main/playlists/tubi_all.m3u",
+  sports: "https://iptv-org.github.io/iptv/categories/sports.m3u",
   freetv: "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8",
 }
 
