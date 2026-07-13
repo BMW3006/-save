@@ -60,35 +60,68 @@ export function TopScorers() {
   }
 
   return (
-    <Card>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">Rank</TableHead>
-              <TableHead>Player</TableHead>
-              <TableHead>Team</TableHead>
-              <TableHead className="text-center">Goals</TableHead>
-              <TableHead className="text-center">Matches</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {scorers.map((player, idx) => (
-              <TableRow key={player.id || idx}>
-                <TableCell>
-                  <Badge variant="outline">{idx + 1}</Badge>
-                </TableCell>
-                <TableCell className="font-medium">{player.name || player.player}</TableCell>
-                <TableCell>{player.team}</TableCell>
-                <TableCell className="text-center font-bold text-lg">
-                  {player.goals || player.goals_scored}
-                </TableCell>
-                <TableCell className="text-center">{player.matches || player.appearances}</TableCell>
+    <>
+      {/* Desktop Table */}
+      <Card className="hidden md:block">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">Rank</TableHead>
+                <TableHead>Player</TableHead>
+                <TableHead>Team</TableHead>
+                <TableHead className="text-center">Goals</TableHead>
+                <TableHead className="text-center">Matches</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {scorers.map((player, idx) => (
+                <TableRow key={player.id || idx}>
+                  <TableCell>
+                    <Badge variant="outline">{idx + 1}</Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">{player.name || player.player}</TableCell>
+                  <TableCell>{player.team}</TableCell>
+                  <TableCell className="text-center font-bold text-lg">
+                    {player.goals || player.goals_scored}
+                  </TableCell>
+                  <TableCell className="text-center">{player.matches || player.appearances}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {scorers.map((player, idx) => {
+          const playerName = player.player?.name || player.name || 'Unknown'
+          const teamName = player.team?.name || player.team || 'Unknown'
+          const goals = player.goals || player.goals_scored || 0
+          const matches = player.games || player.matches || player.appearances || 0
+          const ratio = matches > 0 ? (goals / matches).toFixed(2) : '0.00'
+
+          return (
+            <Card key={`mobile-${idx}-${playerName}`} className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <Badge className="text-lg font-bold px-2.5 h-8 flex items-center">{idx + 1}</Badge>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate text-sm">{playerName}</p>
+                    <p className="text-xs text-muted-foreground">{teamName}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-2xl text-primary">{goals}</p>
+                  <p className="text-xs text-muted-foreground">{matches} matches</p>
+                  <p className="text-xs text-muted-foreground">{ratio} p/m</p>
+                </div>
+              </div>
+            </Card>
+          )
+        })}
       </div>
-    </Card>
+    </>
   )
 }
