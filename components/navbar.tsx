@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Menu, Bookmark, Tv, Sun, Moon, Flame, Star, Calendar, User, LogOut, Music, Download, Radio, Sparkles, Code } from "lucide-react"
+import { Search, Menu, Bookmark, Tv, Sun, Moon, Flame, Star, Calendar, User, LogOut, Music, Download, Radio, Sparkles, Code, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -108,6 +108,18 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Football Link */}
+            <Link href="/football" className="hidden sm:block">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+              >
+                <Trophy className="h-4 w-4" />
+                Football
+              </Button>
+            </Link>
+
             {/* Music Search Link */}
             <Link href="/music" className="hidden sm:block">
               <Button
@@ -238,6 +250,14 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
                       </Button>
                     ))}
                   </div>
+
+                  {/* Football Mobile */}
+                  <Link href="/football" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full justify-start gap-3">
+                      <Trophy className="h-5 w-5" />
+                      Football
+                    </Button>
+                  </Link>
 
                   {/* Music Search Mobile */}
                   <Link href="/music" onClick={() => setIsOpen(false)}>
