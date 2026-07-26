@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { User, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { User, Mail, Lock, Eye, EyeOff, Loader2, Gift } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,7 +13,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { createClient } from "@/lib/supabase/client"
+import { ReferralInput } from "@/components/referral/referral-input"
 import { toast } from "sonner"
 
 interface AuthModalProps {
@@ -35,6 +37,22 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [signupEmail, setSignupEmail] = useState("")
   const [signupPassword, setSignupPassword] = useState("")
   const [signupUsername, setSignupUsername] = useState("")
+  const [referralCode, setReferralCode] = useState("")
+
+  // Load referral code from sessionStorage or URL
+  useEffect(() => {
+    const stored = sessionStorage.getItem("referral_code")
+    if (stored) {
+      setReferralCode(stored)
+      sessionStorage.removeItem("referral_code")
+    }
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const ref = urlParams.get("ref")
+    if (ref) {
+      setReferralCode(ref)
+    }
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -76,6 +94,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             `${window.location.origin}/auth/callback`,
           data: {
             username: signupUsername,
+            referral_code: referralCode,
           },
         },
       })
@@ -83,6 +102,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       if (error) {
         toast.error(error.message)
       } else {
+        // If referral code provided, claim it after signup
+        if (referralCode) {
+          sessionStorage.setItem("pending_referral_claim", referralCode)
+        }
         toast.success("Account created! Please check your email to confirm.")
         setActiveTab("login")
       }
@@ -172,6 +195,15 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
           <TabsContent value="signup" className="mt-6">
             <form onSubmit={handleSignup} className="space-y-4">
+              {referralCode && (
+                <Alert className="border-primary/50 bg-primary/5">
+                  <Gift className="h-4 w-4" />
+                  <AlertDescription>
+                    You&apos;ll earn 100 tokens when you complete signup!
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="signup-username">Username</Label>
                 <div className="relative">
@@ -234,6 +266,20 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                   Password must be at least 6 characters
                 </p>
               </div>
+
+              {!referralCode && (
+                <div className="space-y-2">
+                  <Label htmlFor="referral-code">Referral Code (Optional)</Label>
+                  <Input
+                    id="referral-code"
+                    type="text"
+                    placeholder="Enter referral code"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    className="font-mono"
+                  />
+                </div>
+              )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
