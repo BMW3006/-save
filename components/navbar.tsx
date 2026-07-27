@@ -8,6 +8,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useWatchlist } from "@/lib/watchlist"
 import { NotificationsPanel } from "@/components/notifications-panel"
 import { AuthModal } from "@/components/auth-modal"
+import { ProfileModal } from "@/components/profile/profile-modal"
+import { ProfileAvatar } from "@/components/profile/profile-avatar"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import Link from "next/link"
@@ -24,7 +26,9 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
   const [searchQuery, setSearchQuery] = useState("")
   const [isOpen, setIsOpen] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [profile, setProfile] = useState<any>(null)
   const { watchlist } = useWatchlist()
 
   useEffect(() => {
@@ -33,15 +37,35 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
     // Get initial user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
+      if (user) {
+        fetchProfile()
+      }
     })
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) {
+        fetchProfile()
+      } else {
+        setProfile(null)
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch('/api/profile/fetch')
+      const data = await res.json()
+      if (res.ok) {
+        setProfile(data.profile)
+      }
+    } catch (error) {
+      console.error('[v0] Fetch profile error:', error)
+    }
+  }
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -64,12 +88,14 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
     { id: "livetv", label: "Live TV", icon: Radio },
     { id: "music", label: "Music", icon: Music },
     { id: "download", label: "Download", icon: Download },
+    { id: "football", label: "Football", icon: Trophy },
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-baseline gap-0.5 shrink-0" onClick={() => onCategoryChange("trending")}>
             <span className="text-lg font-bold text-foreground">NADHILI</span>
@@ -184,14 +210,29 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
 
             {/* User Account */}
             {user ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLogout}
-                title="Logout"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowProfileModal(true)}
+                  title="Profile"
+                  className="hover:bg-primary/10"
+                >
+                  <ProfileAvatar
+                    avatarUrl={profile?.avatar_url}
+                    displayName={profile?.display_name}
+                    size="sm"
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                  title="Logout"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </>
             ) : (
               <Button
                 variant="ghost"
@@ -202,105 +243,47 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
                 <User className="h-5 w-5" />
               </Button>
             )}
-
-            {/* Auth Modal */}
-            <AuthModal
-              isOpen={showAuthModal}
-              onClose={() => setShowAuthModal(false)}
-              onSuccess={() => setShowAuthModal(false)}
-            />
-
-            {/* Mobile Menu */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-80 bg-background">
-                <div className="flex flex-col gap-6 mt-8">
-                  {/* Mobile Search */}
-                  <form onSubmit={handleSearch} className="md:hidden">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 bg-secondary"
-                      />
-                    </div>
-                  </form>
-
-                  {/* Mobile Categories */}
-                  <div className="flex flex-col gap-2">
-                    {categories.map((cat) => (
-                      <Button
-                        key={cat.id}
-                        variant={currentCategory === cat.id ? "default" : "ghost"}
-                        className="justify-start gap-3"
-                        onClick={() => {
-                          onCategoryChange(cat.id)
-                          setIsOpen(false)
-                        }}
-                      >
-                        <cat.icon className="h-5 w-5" />
-                        {cat.label}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Football Mobile */}
-                  <Link href="/football" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start gap-3">
-                      <Trophy className="h-5 w-5" />
-                      Football
-                    </Button>
-                  </Link>
-
-                  {/* Music Search Mobile */}
-                  <Link href="/music" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start gap-3">
-                      <Music className="h-5 w-5" />
-                      Music Search
-                    </Button>
-                  </Link>
-
-                  {/* AI Link Mobile */}
-                  <Link href="/ai" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full justify-start gap-3 bg-gradient-to-r from-primary to-accent text-primary-foreground">
-                      <Sparkles className="h-5 w-5" />
-                      BMW AI
-                    </Button>
-                  </Link>
-
-                  {/* API Link Mobile */}
-                  <Link href="/api-docs" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full justify-start gap-3">
-                      <Code className="h-5 w-5" />
-                      API Docs
-                    </Button>
-                  </Link>
-
-                  {/* Theme Toggle Mobile */}
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      onToggleTheme()
-                      setIsOpen(false)
-                    }}
-                    className="justify-start gap-3"
-                  >
-                    {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    {isDark ? "Light Mode" : "Dark Mode"}
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </div>
     </nav>
+
+      {/* Category Bar - Show all 8 categories */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-hide">
+            {categories.map((cat) => (
+              <Button
+                key={cat.id}
+                variant={currentCategory === cat.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => onCategoryChange(cat.id)}
+                className="gap-1.5 whitespace-nowrap"
+              >
+                <cat.icon className="h-4 w-4" />
+                {cat.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false)
+        }}
+      />
+
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false)
+          fetchProfile()
+        }}
+        profile={profile}
+      />
+    </>
   )
 }

@@ -28,7 +28,7 @@ import {
   type Movie,
 } from "@/lib/tmdb"
 
-type Category = "trending" | "top_rated" | "upcoming" | "tv" | "watchlist" | "music" | "livetv" | "download"
+type Category = "trending" | "top_rated" | "upcoming" | "tv" | "watchlist" | "music" | "livetv" | "download" | "football"
 
 export default function HomePage() {
   const [isDark, setIsDark] = useState(true)
@@ -174,7 +174,7 @@ export default function HomePage() {
         onToggleTheme={toggleTheme}
       />
 
-      <main className="pt-20 pb-10">
+      <main className="pt-36 pb-10">
         <div className="max-w-7xl mx-auto px-4 space-y-8">
           {/* Banner */}
           <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-primary-foreground">
@@ -196,6 +196,13 @@ export default function HomePage() {
               movies={searchResults.length > 0 ? searchResults : trendingMovies}
               onSearch={handleSearch}
             />
+          ) : category === "football" ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">Football content - Navigate to /football page</p>
+              <a href="/football" className="text-primary hover:underline">
+                View Football Stats &rarr;
+              </a>
+            </div>
           ) : category === "music" ? (
             <div className="space-y-8">
               {/* Song Recognition */}
