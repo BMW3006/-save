@@ -247,6 +247,7 @@ async function searchYouTubeMusic(query: string) {
     if (data && data.status === true && data.result) {
       const track = data.result
       console.log('[v0] YouTube Music found:', track.title)
+      console.log('[v0] Track data:', JSON.stringify(track, null, 2))
       
       // Parse duration from string format (e.g., "4:23" to seconds)
       let durationSeconds = 0
@@ -259,15 +260,42 @@ async function searchYouTubeMusic(query: string) {
         }
       }
       
+      // Extract all available thumbnails (high quality preference)
+      const coverImage = track.thumbnail || track.thumbnails?.[0] || track.cover || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
+      
+      // Build download formats from available links
+      const downloadFormats = []
+      if (track.download) {
+        downloadFormats.push({
+          format: 'MP3 (320kbps)',
+          url: track.download,
+        })
+      } else if (track.downloadUrl) {
+        downloadFormats.push({
+          format: 'MP3 (320kbps)',
+          url: track.downloadUrl,
+        })
+      } else if (track.link) {
+        downloadFormats.push({
+          format: 'MP3 (320kbps)',
+          url: track.link,
+        })
+      } else if (track.url) {
+        downloadFormats.push({
+          format: 'MP3 (320kbps)',
+          url: track.url,
+        })
+      }
+      
       return {
-        id: track.videoId || `yt-${Date.now()}`,
+        id: track.videoId || track.id || `yt-${Date.now()}`,
         title: track.title || 'Unknown Title',
-        artist: track.channel || 'Various Artists',
+        artist: track.channel || track.artist || 'Various Artists',
         duration: durationSeconds,
-        coverImage: track.thumbnail || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+        coverImage: coverImage,
         source: 'YouTube Music',
-        url: track.url || '',
-        downloadFormats: [
+        url: track.url || track.download || track.link || '',
+        downloadFormats: downloadFormats.length > 0 ? downloadFormats : [
           {
             format: 'MP3 (320kbps)',
             url: track.download || track.url || '',
