@@ -42,7 +42,7 @@ export function Slideshow({ movies, onMovieClick }: SlideshowProps) {
 
   if (slides.length === 0) {
     return (
-      <div className="h-[400px] md:h-[500px] bg-secondary rounded-3xl flex items-center justify-center">
+      <div className="h-56 sm:h-[400px] md:h-[500px] bg-secondary rounded-2xl sm:rounded-3xl flex items-center justify-center">
         <p className="text-muted-foreground">Loading slideshow...</p>
       </div>
     )
@@ -52,7 +52,7 @@ export function Slideshow({ movies, onMovieClick }: SlideshowProps) {
   const inWatchlist = isInWatchlist(currentMovie.id)
 
   return (
-    <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden group">
+    <div className="relative h-56 sm:h-[400px] md:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden group">
       {/* Slides */}
       {slides.map((movie, idx) => (
         <div
@@ -79,15 +79,15 @@ export function Slideshow({ movies, onMovieClick }: SlideshowProps) {
       ))}
 
       {/* Content */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-end p-6 md:p-10">
-        <div className="max-w-xl space-y-4">
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-tight text-balance">
+      <div className="absolute inset-0 z-20 flex flex-col justify-end p-3 sm:p-6 md:p-10">
+        <div className="max-w-xl space-y-2 sm:space-y-4">
+          <h2 className="text-lg sm:text-2xl md:text-4xl font-bold text-foreground leading-tight text-balance line-clamp-2 sm:line-clamp-none">
             {currentMovie.title || currentMovie.name}
           </h2>
           
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
             <span className="flex items-center gap-1 text-accent font-semibold">
-              <Star className="h-4 w-4 fill-accent" />
+              <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-accent" />
               {currentMovie.vote_average?.toFixed(1)}/10
             </span>
             <span className="text-muted-foreground">
@@ -95,29 +95,31 @@ export function Slideshow({ movies, onMovieClick }: SlideshowProps) {
             </span>
           </div>
 
-          <p className="text-muted-foreground text-sm md:text-base line-clamp-2 md:line-clamp-3">
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-base line-clamp-1 sm:line-clamp-2 md:line-clamp-3">
             {currentMovie.overview}
           </p>
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex items-center gap-2 sm:gap-3 pt-1 sm:pt-2">
             <Button
               onClick={() => onMovieClick(currentMovie)}
-              className="gap-2 rounded-full"
+              className="gap-2 rounded-full text-xs sm:text-sm py-1 sm:py-2 px-3 sm:px-4"
+              size="sm"
             >
-              <Play className="h-4 w-4" />
-              View Details
+              <Play className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">View Details</span>
+              <span className="sm:hidden">Details</span>
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full"
+              className="rounded-full h-8 w-8 sm:h-10 sm:w-10"
               onClick={() =>
                 inWatchlist
                   ? removeFromWatchlist(currentMovie.id)
                   : addToWatchlist(currentMovie)
               }
             >
-              {inWatchlist ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {inWatchlist ? <Check className="h-3 w-3 sm:h-4 sm:w-4" /> : <Plus className="h-3 w-3 sm:h-4 sm:w-4" />}
             </Button>
           </div>
         </div>

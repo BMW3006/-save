@@ -94,174 +94,124 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-baseline gap-0.5 shrink-0" onClick={() => onCategoryChange("trending")}>
-            <span className="text-lg font-bold text-foreground">NADHILI</span>
-            <span className="text-xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">_DB</span>
-          </Link>
-
-          {/* Search - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search movies & TV shows..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 bg-secondary border-border rounded-full"
-              />
-            </div>
-          </form>
-
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
-            {categories.map((cat) => (
-              <Button
-                key={cat.id}
-                variant={currentCategory === cat.id ? "default" : "ghost"}
-                size="sm"
-                onClick={() => onCategoryChange(cat.id)}
-                className="gap-1.5"
-              >
-                <cat.icon className="h-4 w-4" />
-                {cat.label}
-              </Button>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {/* Football Link */}
-            <Link href="/football" className="hidden sm:block">
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5"
-              >
-                <Trophy className="h-4 w-4" />
-                Football
-              </Button>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            {/* Logo */}
+            <Link href="/" className="flex items-baseline gap-0.5 shrink-0 min-w-fit" onClick={() => onCategoryChange("trending")}>
+              <span className="text-sm sm:text-lg font-bold text-foreground">NADHILI</span>
+              <span className="text-base sm:text-xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">_DB</span>
             </Link>
 
-            {/* Music Search Link */}
-            <Link href="/music" className="hidden sm:block">
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5"
-              >
-                <Music className="h-4 w-4" />
-                Music
-              </Button>
-            </Link>
+            {/* Search - Mobile & Desktop */}
+            <form onSubmit={handleSearch} className="hidden sm:flex flex-1 max-w-md">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 bg-secondary border-border rounded-full text-sm"
+                />
+              </div>
+            </form>
 
-            {/* AI Link */}
-            <Link href="/ai" className="hidden sm:block">
-              <Button
-                size="sm"
-                className="gap-1.5 bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90"
-              >
-                <Sparkles className="h-4 w-4" />
-                AI
-              </Button>
-            </Link>
+            {/* Actions */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* API Docs Link */}
+              <Link href="/api-docs">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-9 w-9 sm:h-10 sm:w-10"
+                  title="API Documentation"
+                >
+                  <Code className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
+              </Link>
 
-            {/* API Docs Link */}
-            <Link href="/api-docs">
               <Button
-                size="icon"
                 variant="ghost"
-                className="sm:size-auto sm:px-3"
-                title="API Documentation"
+                size="icon"
+                onClick={onToggleTheme}
+                className="h-9 w-9 sm:h-10 sm:w-10"
               >
-                <Code className="h-5 w-5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline ml-1.5">API</span>
+                {isDark ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </Button>
-            </Link>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onToggleTheme}
-              className="hidden sm:flex"
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+              {/* Notifications */}
+              <NotificationsPanel />
 
-            {/* Notifications */}
-            <NotificationsPanel />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onCategoryChange("watchlist")}
+                className="relative h-9 w-9 sm:h-10 sm:w-10"
+              >
+                <Bookmark className="h-4 w-4 sm:h-5 sm:w-5" />
+                {watchlist.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                    {watchlist.length > 9 ? "9+" : watchlist.length}
+                  </span>
+                )}
+              </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onCategoryChange("watchlist")}
-              className="relative"
-            >
-              <Bookmark className="h-5 w-5" />
-              {watchlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                  {watchlist.length}
-                </span>
+              {/* User Account */}
+              {user ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowProfileModal(true)}
+                    title="Profile"
+                    className="h-9 w-9 sm:h-10 sm:w-10 hover:bg-primary/10"
+                  >
+                    <ProfileAvatar
+                      avatarUrl={profile?.avatar_url}
+                      displayName={profile?.display_name}
+                      size="sm"
+                    />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleLogout}
+                    title="Logout"
+                    className="h-9 w-9 sm:h-10 sm:w-10 hidden sm:flex"
+                  >
+                    <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowAuthModal(true)}
+                  title="Login / Sign Up"
+                  className="h-9 w-9 sm:h-10 sm:w-10"
+                >
+                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Button>
               )}
-            </Button>
-
-            {/* User Account */}
-            {user ? (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowProfileModal(true)}
-                  title="Profile"
-                  className="hover:bg-primary/10"
-                >
-                  <ProfileAvatar
-                    avatarUrl={profile?.avatar_url}
-                    displayName={profile?.display_name}
-                    size="sm"
-                  />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleLogout}
-                  title="Logout"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowAuthModal(true)}
-                title="Login / Sign Up"
-              >
-                <User className="h-5 w-5" />
-              </Button>
-            )}
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
       {/* Category Bar - Show all 8 categories */}
-      <div className="fixed top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-hide">
+      <div className="fixed top-14 sm:top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4">
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto py-2 scrollbar-hide">
             {categories.map((cat) => (
               <Button
                 key={cat.id}
                 variant={currentCategory === cat.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => onCategoryChange(cat.id)}
-                className="gap-1.5 whitespace-nowrap"
+                className="gap-1 sm:gap-1.5 whitespace-nowrap text-xs sm:text-sm py-1 sm:py-2 px-2 sm:px-3"
               >
-                <cat.icon className="h-4 w-4" />
-                {cat.label}
+                <cat.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">{cat.label}</span>
               </Button>
             ))}
           </div>

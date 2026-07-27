@@ -27,11 +27,11 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
 
   return (
     <div
-      className="group relative flex-shrink-0 w-[160px] md:w-[180px] cursor-pointer"
+      className="group relative flex-shrink-0 w-32 sm:w-[160px] md:w-[180px] cursor-pointer"
       onClick={onClick}
     >
       {/* Poster */}
-      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-secondary">
+      <div className="relative aspect-[2/3] rounded-lg sm:rounded-2xl overflow-hidden bg-secondary">
         {movie.poster_path ? (
           <img
             src={`${IMG_URL}${movie.poster_path}`}
@@ -50,15 +50,15 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
 
         {/* TV Badge */}
         {movie.media_type === "tv" && (
-          <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium flex items-center gap-1">
-            <Tv className="h-3 w-3" />
-            TV
+          <div className="absolute top-1 left-1 sm:top-2 sm:left-2 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium flex items-center gap-0.5 sm:gap-1">
+            <Tv className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+            <span className="hidden sm:inline">TV</span>
           </div>
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-semibold flex items-center gap-1">
-          <Star className="h-3 w-3 fill-accent text-accent" />
+        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-semibold flex items-center gap-0.5 sm:gap-1">
+          <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-accent text-accent" />
           {movie.vote_average?.toFixed(1)}
         </div>
 
@@ -86,8 +86,8 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
       </div>
 
       {/* Info */}
-      <div className="mt-3 space-y-1">
-        <h3 className="font-medium text-sm line-clamp-1 text-foreground group-hover:text-primary transition-colors">
+      <div className="mt-2 sm:mt-3 space-y-0.5 sm:space-y-1">
+        <h3 className="font-medium text-xs sm:text-sm line-clamp-1 text-foreground group-hover:text-primary transition-colors">
           {movie.title || movie.name}
         </h3>
         <p className="text-xs text-muted-foreground">
