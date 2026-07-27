@@ -107,7 +107,6 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
           </div>
           <div>
             <h3 className="font-semibold text-foreground">Search Music</h3>
-            <p className="text-sm text-muted-foreground">Find songs using Azbry Music API</p>
           </div>
         </div>
 
