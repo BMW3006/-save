@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Mock music database - simulates real API data
+// YouTube Music API using azbry service
+const YOUTUBE_MUSIC_API = 'https://api.azbry.com/api/download/ytplay'
+
+// Mock music database - fallback for demo purposes
 const MOCK_SONGS: Record<string, any[]> = {
   'blinding lights': [
     {
@@ -224,6 +227,80 @@ const MOCK_SONGS: Record<string, any[]> = {
   ],
 }
 
+async function searchYouTubeMusic(query: string) {
+  try {
+    const response = await fetch(`${YOUTUBE_MUSIC_API}?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      console.log('[v0] YouTube Music API error:', response.status)
+      return null
+    }
+
+    const data = await response.json()
+    
+    // Check if the API returned a successful result
+    if (data && data.status === true && data.result) {
+      const track = data.result
+      console.log('[v0] YouTube Music found:', track.title)
+      
+      // Parse duration from string format (e.g., "4:23" to seconds)
+      let durationSeconds = 0
+      if (track.duration) {
+        const parts = track.duration.split(':')
+        if (parts.length === 2) {
+          durationSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1])
+        } else if (parts.length === 3) {
+          durationSeconds = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2])
+        }
+      }
+      
+      return {
+        id: track.videoId || `yt-${Date.now()}`,
+        title: track.title || 'Unknown Title',
+        artist: track.channel || 'Various Artists',
+        duration: durationSeconds,
+        coverImage: track.thumbnail || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+        source: 'YouTube Music',
+        url: track.url || '',
+        downloadFormats: [
+          {
+            format: 'MP3 (320kbps)',
+            url: track.download || track.url || '',
+          },
+        ],
+        qualityOptions: [
+          {
+            quality: 'High',
+            bitrate: '320kbps',
+            format: 'MP3',
+          },
+          {
+            quality: 'Medium',
+            bitrate: '192kbps',
+            format: 'MP3',
+          },
+          {
+            quality: 'Low',
+            bitrate: '128kbps',
+            format: 'MP3',
+          },
+        ],
+      }
+    }
+    
+    console.log('[v0] YouTube Music API returned no results:', data)
+    return null
+  } catch (error: any) {
+    console.error('[v0] YouTube Music API error:', error.message)
+    return null
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -238,7 +315,16 @@ export async function POST(request: NextRequest) {
 
     console.log('[v0] Searching for:', query)
 
-    // Search in mock database (case-insensitive)
+    // First try YouTube Music API
+    const youtubeTrack = await searchYouTubeMusic(query)
+    if (youtubeTrack) {
+      return NextResponse.json({
+        success: true,
+        data: youtubeTrack,
+      })
+    }
+
+    // Fallback to mock database if API fails
     const searchQuery = query.toLowerCase().trim()
     let results = []
 
@@ -266,7 +352,7 @@ export async function POST(request: NextRequest) {
 
     if (results.length > 0) {
       const track = results[0]
-      console.log('[v0] Found song:', track.title)
+      console.log('[v0] Found song in mock database:', track.title)
 
       return NextResponse.json({
         success: true,
@@ -278,7 +364,6 @@ export async function POST(request: NextRequest) {
           duration: track.duration,
           coverImage: track.coverImage,
           source: track.source,
-          apiSource: 'spotify-mock',
           downloadFormats: track.downloadFormats,
           qualityOptions: [
             {
@@ -303,24 +388,11 @@ export async function POST(request: NextRequest) {
 
     console.log('[v0] No songs found for query:', query)
     
-    // Get available suggestions
-    const suggestions = [
-      'Mbosso (Yanga Boy, Hodari)',
-      'Diamond Platnumz (Ye)',
-      'Harmonize (Mbongo)',
-      'Rayvanny (Down)',
-      'Blinding Lights',
-      'Bohemian Rhapsody',
-      'Africa',
-      'Shape of You',
-      'Imagine',
-    ]
-    
     return NextResponse.json(
       {
         success: false,
         error: 'Song not found',
-        message: `Could not find "${query}". Try searching for: ${suggestions.join(', ')}`,
+        message: `Could not find "${query}". Try searching for popular songs like "Blinding Lights", "Bohemian Rhapsody", or "Africa".`,
       },
       { status: 404 }
     )
