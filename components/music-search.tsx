@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { Music, Download, Heart, Search, Loader2, MessageCircle } from 'lucide-react'
+import { Music, Download, Heart, Search, Loader2, MessageCircle, Play } from 'lucide-react'
 import { MusicTrack, saveMusicTrack, addFavoriteTrack, removeFavoriteTrack, isFavorited } from '@/lib/music'
 import { generateSongShareUrl, SUPPORT_WHATSAPP } from '@/lib/share'
 import { ShareButton } from './share-button'
+import { useMusic } from '@/context/music-context'
 
 export function MusicSearch() {
   const [query, setQuery] = useState('')
@@ -15,6 +16,7 @@ export function MusicSearch() {
   const [track, setTrack] = useState<MusicTrack | null>(null)
   const [error, setError] = useState('')
   const [isFavorite, setIsFavorite] = useState(false)
+  const { setCurrentTrack, isPlaying, togglePlayPause, currentTrack } = useMusic()
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,6 +67,21 @@ export function MusicSearch() {
       addFavoriteTrack(track)
       setIsFavorite(true)
     }
+  }
+
+  const handlePlayClick = (track: MusicTrack) => {
+    setCurrentTrack({
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      duration: track.duration,
+      coverImage: track.coverImage,
+      url: track.url,
+      videoId: track.videoId,
+      youtubeUrl: track.youtubeUrl,
+      downloadFormats: track.downloadFormats,
+    })
+    togglePlayPause()
   }
 
   return (
@@ -129,12 +146,17 @@ export function MusicSearch() {
                   <p>
                     <span className="font-semibold">Duration:</span> {track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : 'N/A'}
                   </p>
-                  <p>
-                    <span className="font-semibold">Source:</span> {track.source}
-                  </p>
                 </div>
 
                 <div className="flex gap-2 flex-wrap pt-2">
+                  <Button
+                    onClick={() => handlePlayClick(track)}
+                    variant="default"
+                    className="gap-2 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Play className="w-4 h-4" />
+                    {currentTrack?.id === track.id && isPlaying ? 'Stop' : 'Play'}
+                  </Button>
                   <Button
                     onClick={() => handleDownload(track)}
                     disabled={!track.downloadFormats?.length}
