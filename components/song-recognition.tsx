@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { Search, Loader2, Music2, Download, Play, FileDown, Volume2, X } from "lucide-react"
+import { useState } from "react"
+import { Search, Loader2, Music2, FileDown, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { useMusic } from "@/context/music-context"
 
 interface AzbryTrack {
   id: string
@@ -35,9 +35,7 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
   const [foundSong, setFoundSong] = useState<AzbryTrack | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const { setCurrentTrack, isPlaying, togglePlayPause } = useMusic()
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return
@@ -77,27 +75,20 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
     }
   }
 
-  const togglePlay = async () => {
-    if (!foundSong?.youtubeUrl) return
-
-    if (isPlaying) {
-      if (audioRef.current) {
-        audioRef.current.pause()
-      }
-      setIsPlaying(false)
-    } else {
-      if (!audioRef.current) {
-        audioRef.current = new Audio()
-      }
-      // Try to play from the Azbry download URL
-      if (foundSong.url) {
-        audioRef.current.src = foundSong.url
-        audioRef.current.play().catch(() => {
-          console.log("[v0] Could not auto-play audio, may be restricted")
-        })
-        setIsPlaying(true)
-      }
-    }
+  const handlePlayClick = () => {
+    if (!foundSong) return
+    setCurrentTrack({
+      id: foundSong.id,
+      title: foundSong.title,
+      artist: foundSong.artist,
+      duration: foundSong.duration,
+      coverImage: foundSong.coverImage,
+      url: foundSong.url,
+      videoId: foundSong.videoId,
+      youtubeUrl: foundSong.youtubeUrl,
+      downloadFormats: foundSong.downloadFormats,
+    })
+    togglePlayPause()
   }
 
   const handleDownload = (format: AzbryTrack['downloadFormats'][0]) => {
@@ -182,25 +173,22 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
                   <h4 className="font-semibold text-lg">{foundSong.title}</h4>
                   <p className="text-muted-foreground">{foundSong.artist}</p>
                   <p className="text-sm text-muted-foreground">{Math.floor(foundSong.duration / 60)}:{String(foundSong.duration % 60).padStart(2, "0")}</p>
-                  <p className="text-xs text-muted-foreground">Source: {foundSong.source}</p>
                 </div>
               </div>
 
               {/* Play Button */}
               {foundSong.url && (
                 <Button
-                  onClick={togglePlay}
+                  onClick={handlePlayClick}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  {isPlaying ? (
+                  {isPlaying && foundSong.id === foundSong.id ? (
                     <>
-                      <Volume2 className="h-4 w-4 mr-2" />
-                      Now Playing...
+                      ⏸ Stop Playing
                     </>
                   ) : (
                     <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Play Music
+                      ▶ Play Music
                     </>
                   )}
                 </Button>
@@ -229,13 +217,7 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => {
-                  setShowModal(false)
-                  if (audioRef.current) {
-                    audioRef.current.pause()
-                    setIsPlaying(false)
-                  }
-                }}
+                onClick={() => setShowModal(false)}
               >
                 <X className="h-4 w-4 mr-2" />
                 Close

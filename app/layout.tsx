@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from "@/components/ui/sonner"
+import { MusicProvider } from '@/context/music-context'
+import { MusicPlayerBar } from '@/components/music-player-bar'
 import './globals.css'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -44,8 +46,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
-        <Toaster position="bottom-right" />
+        <MusicProvider>
+          {children}
+          <MusicPlayerBar />
+          <Toaster position="bottom-right" />
+        </MusicProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
