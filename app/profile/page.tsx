@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Loader2, Edit, Gift, Users, Copy, Check, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,10 +10,10 @@ import { ProfileAvatar } from '@/components/profile/profile-avatar'
 import { ProfileModal } from '@/components/profile/profile-modal'
 import { ProfileReferralShare } from '@/components/profile/profile-referral-share'
 import { createClient } from '@/lib/supabase/client'
-import { redirect } from 'next/navigation'
 import { toast } from 'sonner'
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -28,7 +29,8 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
-        redirect('/') // Redirect to home if not logged in
+        router.push('/') // Redirect to home if not logged in
+        return
       }
 
       const res = await fetch('/api/profile/fetch')
