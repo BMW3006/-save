@@ -24,57 +24,57 @@ export default function AiPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link href="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
-            <div className="flex items-center gap-2">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
               </div>
-              <div>
-                <h1 className="font-bold text-foreground leading-tight">NADHILI AI</h1>
-                <p className="text-xs text-muted-foreground">Powered by OpenRouter</p>
+              <div className="min-w-0">
+                <h1 className="text-sm sm:font-bold sm:text-foreground font-semibold leading-tight truncate">NADHILI AI</h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Powered by OpenRouter</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Hero */}
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
+        <div className="text-center space-y-2 sm:space-y-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground text-balance">
             AI Tools for Everyone
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-pretty">
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto text-pretty">
             Chat, generate code, and create stunning images — all powered by advanced AI models.
           </p>
         </div>
 
         {/* Tool Selector */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
-              className={`flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
+              className={`flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-2xl border transition-all text-center sm:text-left ${
                 activeTool === tool.id
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card border-border hover:border-primary/50 text-foreground"
               }`}
             >
-              <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+              <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${
                 activeTool === tool.id ? "bg-primary-foreground/20" : "bg-primary/10"
               }`}>
-                <tool.icon className={`h-5 w-5 ${activeTool === tool.id ? "text-primary-foreground" : "text-primary"}`} />
+                <tool.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${activeTool === tool.id ? "text-primary-foreground" : "text-primary"}`} />
               </div>
-              <div>
-                <p className="font-semibold text-sm">{tool.label}</p>
-                <p className={`text-xs ${activeTool === tool.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+              <div className="min-w-0">
+                <p className="font-semibold text-xs sm:text-sm">{tool.label}</p>
+                <p className={`text-xs hidden sm:block ${activeTool === tool.id ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                   {tool.desc}
                 </p>
               </div>

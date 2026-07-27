@@ -174,16 +174,16 @@ export default function HomePage() {
         onToggleTheme={toggleTheme}
       />
 
-      <main className="pt-36 pb-10">
-        <div className="max-w-7xl mx-auto px-4 space-y-8">
+      <main className="pt-28 sm:pt-36 pb-10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 space-y-6 sm:space-y-8">
           {/* Banner */}
-          <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-primary-foreground">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5" />
-              <span className="font-semibold">BMW Community</span>
-              <span className="text-sm opacity-90">Entertainment Hub</span>
+          <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg sm:rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-4 text-primary-foreground">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-sm sm:font-semibold font-medium">BMW Community</span>
+              <span className="text-xs sm:text-sm opacity-90">Entertainment Hub</span>
             </div>
-            <span className="text-sm opacity-80">Movies, Music, Live TV & AI</span>
+            <span className="text-xs sm:text-sm opacity-80">Movies, Music, Live TV & AI</span>
           </div>
 
           {/* Watchlist View */}
@@ -332,9 +332,9 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
+      <footer className="border-t border-border bg-card py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 text-center space-y-1.5 sm:space-y-2">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Powered by <span className="text-primary font-semibold">RX</span> | Mzamini: <span className="text-primary font-semibold">KAVAVILA</span>
           </p>
           <p className="text-xs text-muted-foreground">
