@@ -88,6 +88,7 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
     { id: "livetv", label: "Live TV", icon: Radio },
     { id: "music", label: "Music", icon: Music },
     { id: "download", label: "Download", icon: Download },
+    { id: "football", label: "Football", icon: Trophy },
   ]
 
   return (
@@ -247,11 +248,11 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
       </div>
     </nav>
 
-      {/* Category Bar */}
-      <div className="fixed top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border lg:hidden">
+      {/* Category Bar - Show all 8 categories */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-hide">
-            {categories.slice(0, 3).map((cat) => (
+            {categories.map((cat) => (
               <Button
                 key={cat.id}
                 variant={currentCategory === cat.id ? "default" : "outline"}
