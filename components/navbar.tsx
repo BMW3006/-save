@@ -91,9 +91,10 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between gap-4">
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-baseline gap-0.5 shrink-0" onClick={() => onCategoryChange("trending")}>
             <span className="text-lg font-bold text-foreground">NADHILI</span>
@@ -244,6 +245,27 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
           </div>
         </div>
       </div>
+    </nav>
+
+      {/* Category Bar */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border lg:hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-hide">
+            {categories.slice(0, 3).map((cat) => (
+              <Button
+                key={cat.id}
+                variant={currentCategory === cat.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => onCategoryChange(cat.id)}
+                className="gap-1.5 whitespace-nowrap"
+              >
+                <cat.icon className="h-4 w-4" />
+                {cat.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <AuthModal
         isOpen={showAuthModal}
@@ -261,6 +283,6 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
         }}
         profile={profile}
       />
-    </nav>
+    </>
   )
 }

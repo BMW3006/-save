@@ -1,19 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Loader2, Edit, Gift, Users } from 'lucide-react'
+import { Loader2, Edit, Gift, Users, Copy, Check, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { ProfileAvatar } from '@/components/profile/profile-avatar'
 import { ProfileModal } from '@/components/profile/profile-modal'
 import { ProfileReferralShare } from '@/components/profile/profile-referral-share'
 import { createClient } from '@/lib/supabase/client'
 import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetchProfile()
@@ -39,6 +42,15 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const copyWebsiteLink = () => {
+    if (!profile?.reference_code) return
+    const link = `${typeof window !== 'undefined' ? window.location.origin : 'https://nadhili-db.vercel.app'}/referral/${profile.reference_code}`
+    navigator.clipboard.writeText(link)
+    setCopied(true)
+    toast.success('Website link copied to clipboard!')
+    setTimeout(() => setCopied(false), 2000)
   }
 
   if (isLoading) {
@@ -115,6 +127,44 @@ export default function ProfilePage() {
             </div>
           </Card>
         </div>
+
+        {/* Website Link with Reference Code */}
+        <Card className="p-6 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
+          <div className="flex items-start gap-4">
+            <div className="bg-primary/10 p-3 rounded-lg">
+              <LinkIcon className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold mb-2">Share Your Referral Link</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Share this link with friends to earn 100 tokens per successful referral
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${typeof window !== 'undefined' ? window.location.origin : 'https://nadhili-db.vercel.app'}/referral/${profile?.reference_code || ''}`}
+                  className="bg-background/50"
+                />
+                <Button
+                  onClick={copyWebsiteLink}
+                  className="gap-2 whitespace-nowrap"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Referral Share Section */}
         <ProfileReferralShare />
