@@ -56,20 +56,51 @@ async function searchAzbryMusic(query: string) {
         track.url || 
         ''
       
+      // Extract YouTube video ID from various possible fields
+      const videoId = track.videoId || track.id || track.video_id || ''
+      
+      // Build YouTube URL for the download API
+      const youtubeUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : null
+      
+      // Build download formats with MP3 and MP4 options
+      const downloadFormats = []
+      
+      if (youtubeUrl) {
+        // MP4 format using the provided API
+        downloadFormats.push({
+          format: 'MP4 (720p)',
+          url: `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(youtubeUrl)}`,
+          type: 'video',
+        })
+        
+        // Fallback MP3 from Azbry
+        if (downloadUrl) {
+          downloadFormats.push({
+            format: 'MP3 (320kbps)',
+            url: downloadUrl,
+            type: 'audio',
+          })
+        }
+      } else if (downloadUrl) {
+        // If no YouTube URL, use Azbry download
+        downloadFormats.push({
+          format: 'MP3 (320kbps)',
+          url: downloadUrl,
+          type: 'audio',
+        })
+      }
+      
       return {
-        id: track.videoId || track.id || `azbry-${Date.now()}`,
+        id: videoId || `azbry-${Date.now()}`,
         title: track.title || 'Unknown Title',
         artist: track.channel || track.artist || track.author || 'Various Artists',
         duration: durationSeconds,
         coverImage: coverImage,
         source: 'Azbry Music',
         url: downloadUrl,
-        downloadFormats: downloadUrl ? [
-          {
-            format: 'MP3 (320kbps)',
-            url: downloadUrl,
-          },
-        ] : [],
+        videoId: videoId,
+        youtubeUrl: youtubeUrl,
+        downloadFormats: downloadFormats,
         qualityOptions: [
           {
             quality: 'High',

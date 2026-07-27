@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Loader2, Music2, Download, X } from "lucide-react"
+import { useState, useRef } from "react"
+import { Search, Loader2, Music2, Download, Play, FileDown, Volume2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,9 +16,12 @@ interface AzbryTrack {
   coverImage: string
   source: string
   url: string
+  videoId?: string
+  youtubeUrl?: string
   downloadFormats: Array<{
     format: string
     url: string
+    type?: 'audio' | 'video'
   }>
 }
 
@@ -32,6 +35,9 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
   const [foundSong, setFoundSong] = useState<AzbryTrack | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return
@@ -53,6 +59,7 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
       if (data.success && data.data) {
         setFoundSong(data.data)
         setShowModal(true)
+        setSelectedFormat(null)
         onSongFound?.(data.data)
       } else {
         setError(data.message || "Song not found. Please try another search.")
@@ -67,6 +74,35 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       handleSearch()
+    }
+  }
+
+  const togglePlay = async () => {
+    if (!foundSong?.youtubeUrl) return
+
+    if (isPlaying) {
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      setIsPlaying(false)
+    } else {
+      if (!audioRef.current) {
+        audioRef.current = new Audio()
+      }
+      // Try to play from the Azbry download URL
+      if (foundSong.url) {
+        audioRef.current.src = foundSong.url
+        audioRef.current.play().catch(() => {
+          console.log("[v0] Could not auto-play audio, may be restricted")
+        })
+        setIsPlaying(true)
+      }
+    }
+  }
+
+  const handleDownload = (format: AzbryTrack['downloadFormats'][0]) => {
+    if (format.url) {
+      window.open(format.url, '_blank')
     }
   }
 
@@ -150,23 +186,56 @@ export function SongRecognition({ onSongFound }: SongRecognitionProps) {
                 </div>
               </div>
 
-              {/* Download Button */}
-              {foundSong.downloadFormats.length > 0 && foundSong.downloadFormats[0]?.url && (
-                <a
-                  href={foundSong.downloadFormats[0].url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              {/* Play Button */}
+              {foundSong.url && (
+                <Button
+                  onClick={togglePlay}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <Download className="h-4 w-4" />
-                  Download MP3
-                </a>
+                  {isPlaying ? (
+                    <>
+                      <Volume2 className="h-4 w-4 mr-2" />
+                      Now Playing...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Play Music
+                    </>
+                  )}
+                </Button>
+              )}
+
+              {/* Download Format Selection */}
+              {foundSong.downloadFormats.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Download Format:</p>
+                  <div className="flex flex-col gap-2">
+                    {foundSong.downloadFormats.map((format, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => handleDownload(format)}
+                        variant="outline"
+                        className="w-full justify-center gap-2 hover:bg-primary/10"
+                      >
+                        <FileDown className="h-4 w-4" />
+                        <span>{format.format}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               )}
 
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false)
+                  if (audioRef.current) {
+                    audioRef.current.pause()
+                    setIsPlaying(false)
+                  }
+                }}
               >
                 <X className="h-4 w-4 mr-2" />
                 Close
