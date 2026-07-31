@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Menu, Bookmark, Tv, Sun, Moon, Flame, Star, Calendar, User, LogOut, Music, Download, Radio, Sparkles, Code, Trophy } from "lucide-react"
+import { Menu, Bookmark, Tv, Sun, Moon, Flame, Star, Calendar, User, LogOut, Music, Download, Radio, Sparkles, Code, Trophy } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useWatchlist } from "@/lib/watchlist"
 import { NotificationsPanel } from "@/components/notifications-panel"
 import { AuthModal } from "@/components/auth-modal"
 import { ProfileModal } from "@/components/profile/profile-modal"
 import { ProfileAvatar } from "@/components/profile/profile-avatar"
+import { SearchBar } from "@/components/search-bar"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import Link from "next/link"
@@ -23,8 +23,6 @@ interface NavbarProps {
 }
 
 export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, onToggleTheme }: NavbarProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isOpen, setIsOpen] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
@@ -73,13 +71,6 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
     setUser(null)
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      onSearch(searchQuery.trim())
-    }
-  }
-
   const categories = [
     { id: "trending", label: "Trending", icon: Flame },
     { id: "top_rated", label: "Top Rated", icon: Star },
@@ -102,19 +93,36 @@ export function Navbar({ onSearch, onCategoryChange, currentCategory, isDark, on
               <span className="text-base sm:text-xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">_DB</span>
             </Link>
 
-            {/* Search - Mobile & Desktop */}
-            <form onSubmit={handleSearch} className="hidden sm:flex flex-1 max-w-md">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 bg-secondary border-border rounded-full text-sm"
-                />
-              </div>
-            </form>
+            {/* Search - Desktop */}
+            <div className="hidden sm:flex flex-1 max-w-md">
+              <SearchBar 
+                onSearch={onSearch}
+                showAutocomplete={true}
+              />
+            </div>
+
+            {/* Mobile Search Button */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="sm:hidden h-9 w-9"
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80">
+                <div className="mt-6">
+                  <SearchBar 
+                    onSearch={(query) => {
+                      onSearch(query)
+                    }}
+                    showAutocomplete={true}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
