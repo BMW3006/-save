@@ -29,7 +29,7 @@ export function MovieSection({
           <div className="h-5 sm:h-6 w-1 bg-primary rounded-full" />
           <h2 className="text-lg sm:text-xl font-semibold text-foreground">{title}</h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
@@ -63,14 +63,17 @@ export function MovieSection({
         </button>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5">
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            onClick={() => onMovieClick(movie)}
-          />
-        ))}
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="space-y-2 flex flex-col"
+            >
+              <div className="aspect-[2/3] rounded-xl bg-secondary animate-pulse" />
+              <div className="h-3 bg-secondary rounded animate-pulse" />
+              <div className="h-2 w-12 bg-secondary rounded animate-pulse" />
+            </div>
+          ))}
       </div>
     </section>
   )

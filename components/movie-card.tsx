@@ -57,37 +57,37 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-2 right-2 px-2.5 py-1.5 rounded-full bg-yellow-400/90 backdrop-blur-sm text-xs font-bold flex items-center gap-1 shadow-md">
-          <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+        <div className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full bg-yellow-400/90 backdrop-blur-sm text-xs font-bold flex items-center gap-0.5 shadow-md">
+          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
           {movie.vote_average?.toFixed(1)}
         </div>
 
         {/* Hover Actions */}
-        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <Button
             size="icon"
-            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
+            className="h-9 w-9 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
             onClick={onClick}
           >
-            <Play className="h-6 w-6" />
+            <Play className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
             className={cn(
-              "h-12 w-12 rounded-full bg-background/90 backdrop-blur-md border-2",
+              "h-9 w-9 rounded-full bg-background/90 backdrop-blur-md border-2",
               inWatchlist && "bg-primary text-primary-foreground border-primary"
             )}
             onClick={handleWatchlistToggle}
           >
-            {inWatchlist ? <Check className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+            {inWatchlist ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </Button>
         </div>
       </div>
 
       {/* Info */}
-      <div className="mt-3 space-y-1.5 flex-grow flex flex-col">
-        <h3 className="font-semibold text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors leading-tight">
+      <div className="mt-2 space-y-0.5 flex-grow flex flex-col">
+        <h3 className="font-semibold text-xs line-clamp-2 text-foreground group-hover:text-primary transition-colors leading-tight">
           {movie.title || movie.name}
         </h3>
         <p className="text-xs text-muted-foreground font-medium">
