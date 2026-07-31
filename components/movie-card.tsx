@@ -27,16 +27,16 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
 
   return (
     <div
-      className="group relative flex-shrink-0 w-32 sm:w-[160px] md:w-[180px] cursor-pointer"
+      className="group relative cursor-pointer h-full flex flex-col"
       onClick={onClick}
     >
       {/* Poster */}
-      <div className="relative aspect-[2/3] rounded-lg sm:rounded-2xl overflow-hidden bg-secondary">
+      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-secondary shadow-lg group-hover:shadow-2xl transition-shadow duration-300 flex-shrink-0">
         {movie.poster_path ? (
           <img
             src={`${IMG_URL}${movie.poster_path}`}
             alt={movie.title || movie.name || "Movie poster"}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
           />
         ) : (
@@ -46,51 +46,51 @@ export function MovieCard({ movie, onClick }: MovieCardProps) {
         )}
 
         {/* Overlay on Hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* TV Badge */}
         {movie.media_type === "tv" && (
-          <div className="absolute top-1 left-1 sm:top-2 sm:left-2 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium flex items-center gap-0.5 sm:gap-1">
-            <Tv className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-            <span className="hidden sm:inline">TV</span>
+          <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-primary/95 text-primary-foreground text-xs font-semibold flex items-center gap-1 shadow-md">
+            <Tv className="h-3 w-3" />
+            <span>TV</span>
           </div>
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-semibold flex items-center gap-0.5 sm:gap-1">
-          <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-accent text-accent" />
+        <div className="absolute top-2 right-2 px-2.5 py-1.5 rounded-full bg-yellow-400/90 backdrop-blur-sm text-xs font-bold flex items-center gap-1 shadow-md">
+          <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
           {movie.vote_average?.toFixed(1)}
         </div>
 
         {/* Hover Actions */}
-        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <Button
             size="icon"
-            className="h-10 w-10 rounded-full"
+            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
             onClick={onClick}
           >
-            <Play className="h-5 w-5" />
+            <Play className="h-6 w-6" />
           </Button>
           <Button
             variant="outline"
             size="icon"
             className={cn(
-              "h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm",
+              "h-12 w-12 rounded-full bg-background/90 backdrop-blur-md border-2",
               inWatchlist && "bg-primary text-primary-foreground border-primary"
             )}
             onClick={handleWatchlistToggle}
           >
-            {inWatchlist ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+            {inWatchlist ? <Check className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
           </Button>
         </div>
       </div>
 
       {/* Info */}
-      <div className="mt-2 sm:mt-3 space-y-0.5 sm:space-y-1">
-        <h3 className="font-medium text-xs sm:text-sm line-clamp-1 text-foreground group-hover:text-primary transition-colors">
+      <div className="mt-3 space-y-1.5 flex-grow flex flex-col">
+        <h3 className="font-semibold text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors leading-tight">
           {movie.title || movie.name}
         </h3>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground font-medium">
           {(movie.release_date || movie.first_air_date)?.slice(0, 4) || "TBA"}
         </p>
       </div>

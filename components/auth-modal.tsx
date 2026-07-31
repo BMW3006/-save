@@ -60,10 +60,22 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     try {
       const supabase = createClient()
+      
+      // Add CURL_AUTH_HEADER if available
+      const headers: HeadersInit = {}
+      if (process.env.CURL_AUTH_HEADER) {
+        const [key, value] = process.env.CURL_AUTH_HEADER.split(': ')
+        if (key && value) {
+          headers[key] = value
+        }
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: loginPassword,
-      })
+      }, {
+        headers
+      } as any)
 
       if (error) {
         toast.error(error.message)
@@ -85,6 +97,16 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     try {
       const supabase = createClient()
+
+      // Add CURL_AUTH_HEADER if available
+      const headers: HeadersInit = {}
+      if (process.env.CURL_AUTH_HEADER) {
+        const [key, value] = process.env.CURL_AUTH_HEADER.split(': ')
+        if (key && value) {
+          headers[key] = value
+        }
+      }
+
       const { error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
@@ -97,7 +119,9 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             referral_code: referralCode,
           },
         },
-      })
+      }, {
+        headers
+      } as any)
 
       if (error) {
         toast.error(error.message)
